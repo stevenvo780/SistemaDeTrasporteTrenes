@@ -1,13 +1,17 @@
 import random
 from constantes import VELOCIDAD_AGENTES
+import copy
+import time
+
 
 class Agente:
     def __init__(self, simulacion, id, ubicacion):
         self.simulacion = simulacion
         self.id = id
-        self.ubicacion = ubicacion
+        self.ubicacion = ubicacion.copy()
         self.en_metro = False
         self.tren_actual = None
+        self.tiempo_llegada = None
         self.destino = self.encontrar_destino()
 
     def mover(self):
@@ -19,9 +23,9 @@ class Agente:
                 self.subir_a_tren(estacion_cercana)
 
         elif self.en_metro:
-            # Actualizar ubicación del agente a la del tren
-            self.ubicacion = self.tren_actual.estaciones[self.tren_actual.posicion_tren]
-            if self.ubicacion == self.destino:
+            # Actualizar ubicación del agente a la del tren directamente
+            self.ubicacion = copy.deepcopy(self.tren_actual.posicion_tren)
+            if self.esta_cerca(self.ubicacion, self.destino):
                 self.bajarse_del_tren()
 
     def mover_hacia_punto(self, punto):
@@ -40,11 +44,14 @@ class Agente:
     def subir_a_tren(self, estacion):
         for linea in self.simulacion.lineas_metro:
             for tren in linea.trenes:
-                if tren.estaciones[tren.posicion_tren] == estacion and len(tren.agentes) < tren.capacidad:
+                if self.esta_cerca(tren.posicion_tren, estacion) and len(tren.agentes) < tren.capacidad:
                     self.en_metro = True
                     self.tren_actual = tren
                     tren.agentes.append(self)
                     return
+
+    def esta_cerca(self, pos1, pos2, umbral=10):
+        return abs(pos1[0] - pos2[0]) < umbral and abs(pos1[1] - pos2[1]) < umbral
 
     def bajarse_del_tren(self):
         self.tren_actual.agentes.remove(self)
@@ -58,7 +65,8 @@ class Agente:
         estacion_cercana = None
         for linea in self.simulacion.lineas_metro:
             for estacion in linea.estaciones:
-                distancia = ((self.ubicacion[0] - estacion[0])**2 + (self.ubicacion[1] - estacion[1])**2)**0.5
+                distancia = (
+                    (self.ubicacion[0] - estacion[0])**2 + (self.ubicacion[1] - estacion[1])**2)**0.5
                 if distancia < min_distancia:
                     min_distancia = distancia
                     estacion_cercana = estacion

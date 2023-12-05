@@ -29,12 +29,14 @@ class SimulacionMetro:
                 pygame.draw.line(self.ventana, (0, 0, 255), linea.estaciones[i], linea.estaciones[i+1], 2)
 
             for tren in linea.trenes:
-                estacion_con_tren = linea.estaciones[tren.posicion_tren]
+                # Usar directamente la posición actual del tren para dibujarlo
+                estacion_con_tren = tren.posicion_tren
                 pygame.draw.rect(self.ventana, (0, 255, 0), [estacion_con_tren[0] - 10, estacion_con_tren[1] - 10, 20, 20])
 
         for agente in self.agentes:
             color = (235, 0, 0) if not agente.en_metro else (0, 235, 0)
             pygame.draw.circle(self.ventana, color, agente.ubicacion, 5)
+
 
     def ejecutar(self):
         while self.ejecutando:
@@ -43,7 +45,6 @@ class SimulacionMetro:
                     self.ejecutando = False
 
             for linea in self.lineas_metro:
-                time.sleep(1)
                 linea.mover_trenes()
 
             for agente in self.agentes:
