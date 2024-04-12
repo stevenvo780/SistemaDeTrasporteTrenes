@@ -5,7 +5,6 @@ from agente import Agente
 from constantes import NUM_LINEAS_METRO, NUM_AGENTES, TAMANO_ESPACIO, CAPACIDAD_TREN
 import time
 
-
 class SimulacionMetro:
     def __init__(self):
         self.ventana, self.reloj = self.inicializar_pygame()
