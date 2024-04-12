@@ -27,25 +27,29 @@ class SimulacionMetro:
 
     def dibujar_simulacion(self):
         self.ventana.fill((255, 255, 255))
+
         for linea in self.lineas_metro:
             # Dibujar ruta de ida
             for i in range(len(linea.estaciones_ida) - 1):
-                pygame.draw.line(
-                    self.ventana, (0, 0, 255), linea.estaciones_ida[i], linea.estaciones_ida[i+1], 2)
+                pygame.draw.line(self.ventana, (0, 0, 255), linea.estaciones_ida[i], linea.estaciones_ida[i+1], 2)
+                pygame.draw.circle(self.ventana, (0, 0, 255), linea.estaciones_ida[i], 5)  # Dibujar estaciones
 
-            # Dibujar ruta de vuelta (si es diferente)
+            # Dibujar ruta de vuelta
             for i in range(len(linea.estaciones_vuelta) - 1):
-                pygame.draw.line(
-                    self.ventana, (255, 0, 0), linea.estaciones_vuelta[i], linea.estaciones_vuelta[i+1], 2)
+                pygame.draw.line(self.ventana, (255, 0, 0), linea.estaciones_vuelta[i], linea.estaciones_vuelta[i+1], 2)
+                pygame.draw.circle(self.ventana, (255, 0, 0), linea.estaciones_vuelta[i], 5)  # Dibujar estaciones
 
+            # Dibujar trenes
             for tren in linea.trenes:
-                estacion_con_tren = tren.posicion_tren
-                pygame.draw.rect(self.ventana, (0, 255, 0), [
-                                 estacion_con_tren[0] - 10, estacion_con_tren[1] - 10, 20, 20])
+                color_tren = (0, 255, 0) if tren.estaciones_actuales == tren.estaciones_ida else (255, 255, 0)
+                pygame.draw.rect(self.ventana, color_tren, [tren.posicion_tren[0] - 10, tren.posicion_tren[1] - 10, 20, 20])
 
+        # Dibujar agentes
         for agente in self.agentes:
-            color = (235, 0, 0) if not agente.en_metro else (0, 235, 0)
-            pygame.draw.circle(self.ventana, color, agente.ubicacion, 5)
+            color_agente = (235, 255, 0) if not agente.en_metro else (0, 235, 255)
+            pygame.draw.circle(self.ventana, color_agente, agente.ubicacion, 5)
+
+        pygame.display.flip()
 
     def ejecutar(self):
         while self.ejecutando:
